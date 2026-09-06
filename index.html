@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>نبض التفوق</title>
+  
+  <!-- خطوط وأيقونات -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    :root {
+      --bg-color: #111315;
+      --surface-color: #1b1d22;
+      --surface-sub: #25282f;
+      --text-main: #f0f0f2;
+      --text-sub: #9ea3ae;
+      --accent-btn: #a8c7fa;
+      --accent-btn-text: #061e47;
+      --border-color: #2b2e37;
+      --star-color: #e3e3e3;
+      --bar-bg: #2b2e37;
+      --bar-fill: #a8c7fa;
+      --drawer-bg: #1b1d22;
+    }
+
+    [data-theme="light"] {
+      --bg-color: #ffffff;
+      --surface-color: #f0f4f9;
+      --surface-sub: #e2e7ef;
+      --text-main: #1f1f1f;
+      --text-sub: #5f6368;
+      --accent-btn: #0b57d0;
+      --accent-btn-text: #ffffff;
+      --border-color: #e0e0e0;
+      --star-color: #1f1f1f;
+      --bar-bg: #e2e7ef;
+      --bar-fill: #0b57d0;
+      --drawer-bg: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: background-color 0.25s, color 0.25s;
+      padding-bottom: 30px;
+    }
+
+    /* الشريط العلوي */
+    .top-bar {
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+    }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      color: var(--text-main);
+      font-size: 1.15rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .main-content {
+      width: 100%;
+      max-width: 500px;
+      padding: 0 16px;
+    }
+
+    /* معلومات التطبيق والشعار */
+    .app-meta-head {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-top: 6px;
+      margin-bottom: 20px;
+    }
+
+    .app-icon {
+      width: 74px;
+      height: 74px;
+      border-radius: 18px;
+      object-fit: cover;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .app-meta-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .app-meta-text h1 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      line-height: 1.3;
+      color: var(--text-main);
+    }
+
+    .app-meta-text .dev-name {
+      color: #7dacfa;
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    [data-theme="light"] .app-meta-text .dev-name {
+      color: #0b57d0;
+    }
+
+    .app-meta-text .app-subnotes {
+      font-size: 0.72rem;
+      color: var(--text-sub);
+      margin-top: 3px;
+    }
+
+    /* إحصائيات المتجر */
+    .store-stats-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 8px 0;
+      margin-bottom: 18px;
+    }
+
+    .stat-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      flex: 1;
+    }
+
+    .stat-divider {
+      width: 1px;
+      height: 24px;
+      background-color: var(--border-color);
+    }
+
+    .stat-top {
+      font-size: 0.88rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-main);
+    }
+
+    .stat-badge {
+      border: 1px solid var(--text-main);
+      padding: 0px 3px;
+      border-radius: 3px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+
+    .stat-bottom {
+      font-size: 0.72rem;
+      color: var(--text-sub);
+      margin-top: 3px;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .install-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      background-color: var(--accent-btn);
+      color: var(--accent-btn-text);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 10px 0;
+      border-radius: 24px;
+      margin-bottom: 22px;
+      cursor: pointer;
+      border: none;
+    }
+
+    .install-btn:active {
+      opacity: 0.85;
+    }
+
+    /* سلايدر لقطات الشاشة */
+    .shots-slider {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 12px;
+      margin-bottom: 22px;
+      scrollbar-width: none;
+    }
+
+    .shots-slider::-webkit-scrollbar {
+      display: none;
+    }
+
+    .screenshot-frame {
+      flex: 0 0 160px;
+      height: 330px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      background-color: var(--surface-color);
+      cursor: pointer;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+    }
+
+    .screenshot-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* العناوين والروابط التفاعلية */
+    .row-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+
+    .row-title h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .app-short-desc {
+      font-size: 0.82rem;
+      color: var(--text-sub);
+      line-height: 1.55;
+      margin-bottom: 22px;
+    }
+
+    /* جدول معلومات التطبيق المخصص كما في الصورة */
+    .app-info-card {
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 22px;
+    }
+
+    .info-row-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.8rem;
+    }
+
+    .info-row-item:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      color: var(--text-sub);
+    }
+
+    .info-val {
+      font-weight: 600;
+      color: var(--text-main);
+      text-align: left;
+      direction: ltr;
+    }
+
+    .info-val.rtl-text {
+      direction: rtl;
+    }
+
+    /* قسم أمان البيانات */
+    .data-safety-card {
+      background: var(--surface-color);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 22px;
+      border: 1px solid var(--border-color);
+    }
+
+    .safety-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.78rem;
+      margin-bottom: 12px;
+      color: var(--text-main);
+    }
+
+    .safety-item i {
+      font-size: 1rem;
+      width: 20px;
+      text-align: center;
+      color: var(--text-sub);
+    }
+
+    .safety-link {
+      color: #7dacfa;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-decoration: none;
+      display: block;
+      margin-top: 10px;
+    }
+
+    /* دعم التطبيق الأكورديون */
+    .accordion-card {
+      border-top: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      padding: 14px 0;
+      margin-bottom: 22px;
+    }
+
+    .accordion-toggle {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      background: none;
+      border: none;
+      color: var(--text-main);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .accordion-toggle i.fa-chevron-down {
+      transition: transform 0.3s ease;
+      font-size: 0.8rem;
+      color: var(--text-sub);
+    }
+
+    .accordion-toggle.active i.fa-chevron-down {
+      transform: rotate(180deg);
+    }
+
+    .accordion-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .accordion-body.open {
+      padding-top: 14px;
+      max-height: 250px;
+    }
+
+    .support-info-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.82rem;
+      color: var(--text-sub);
+    }
+
+    .support-info-row i {
+      width: 18px;
+      color: var(--text-main);
+      font-size: 0.9rem;
+    }
+
+    .support-info-row a {
+      color: #7dacfa;
+      text-decoration: none;
+    }
+
+    /* قسم التقييمات والمراجعات */
+    .reviews-section {
+      margin-top: 10px;
+    }
+
+    .verification-note {
+      font-size: 0.74rem;
+      color: var(--text-sub);
+      line-height: 1.45;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .rating-breakdown-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .rating-big-num {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 90px;
+    }
+
+    .big-score {
+      font-size: 2.8rem;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+
+    .stars-exact {
+      color: var(--text-main);
+      font-size: 0.72rem;
+      letter-spacing: 2px;
+      margin: 4px 0;
+    }
+
+    .total-reviews-label {
+      font-size: 0.7rem;
+      color: var(--text-sub);
+    }
+
+    .rating-bars-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      padding-left: 12px;
+    }
+
+    .bar-line {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .bar-num {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-main);
+      width: 8px;
+    }
+
+    .bar-track {
+      flex: 1;
+      height: 7px;
+      background-color: var(--bar-bg);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .bar-progress {
+      height: 100%;
+      background-color: var(--bar-fill);
+      border-radius: 10px;
+    }
+
+    /* نموذج كتابة مراجعة */
+    .write-review-card {
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 20px;
+    }
+
+    .stars-picker {
+      display: flex;
+      gap: 6px;
+      font-size: 1.25rem;
+      margin: 6px 0 10px 0;
+      cursor: pointer;
+    }
+
+    .stars-picker i {
+      color: #4a4d57;
+    }
+
+    .stars-picker i.active {
+      color: #fbbc04;
+    }
+
+    .inp-field, .txt-field {
+      width: 100%;
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 8px 10px;
+      color: var(--text-main);
+      font-size: 0.78rem;
+      margin-bottom: 8px;
+      outline: none;
+    }
+
+    .post-btn {
+      background-color: var(--accent-btn);
+      color: var(--accent-btn-text);
+      border: none;
+      padding: 6px 14px;
+      border-radius: 16px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* كروت المراجعات مع الإعجاب والردود */
+    .single-review {
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .reviewer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .reviewer-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #00875a;
+      color: #ffffff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .reviewer-name {
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    .review-date-stars {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.7rem;
+      color: var(--text-sub);
+      margin-bottom: 6px;
+    }
+
+    .review-date-stars .stars-gold {
+      color: #fbbc04;
+      font-size: 0.68rem;
+    }
+
+    .review-body-text {
+      font-size: 0.78rem;
+      color: var(--text-main);
+      line-height: 1.5;
+    }
+
+    /* أزرار التفاعل: إعجاب ورد */
+    .review-actions-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 8px;
+      font-size: 0.75rem;
+    }
+
+    .action-btn-rev {
+      background: none;
+      border: none;
+      color: var(--text-sub);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      transition: color 0.2s;
+    }
+
+    .action-btn-rev.liked {
+      color: #7dacfa;
+    }
+
+    .action-btn-rev:hover {
+      color: var(--text-main);
+    }
+
+    /* صندوق إضافة رد وقائمة الردود */
+    .replies-container {
+      margin-top: 10px;
+      padding-right: 14px;
+      border-right: 2px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .reply-item {
+      background: var(--surface-color);
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+    }
+
+    .reply-author {
+      font-weight: 700;
+      color: #7dacfa;
+      margin-bottom: 2px;
+    }
+
+    .reply-text {
+      color: var(--text-main);
+    }
+
+    .reply-input-box {
+      margin-top: 8px;
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .reply-input-box.show {
+      display: flex;
+    }
+
+    /* نافذة الوصف الطويل المنبثقة (Modal) */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 120;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-sheet {
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 480px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .modal-head {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-head h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .modal-content-scroll {
+      padding: 16px 18px;
+      overflow-y: auto;
+      font-size: 0.84rem;
+      line-height: 1.7;
+      color: var(--text-main);
+      white-space: pre-line;
+    }
+
+    /* القائمة الجانبية (Drawer) */
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .drawer-backdrop.show {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .side-menu {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      right: -280px;
+      width: 280px;
+      background: var(--drawer-bg);
+      z-index: 101;
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transition: right 0.25s ease;
+      box-shadow: -4px 0 20px rgba(0,0,0,0.5);
+    }
+
+    .side-menu.show {
+      right: 0;
+    }
+
+    .menu-title {
+      font-size: 1rem;
+      font-weight: 700;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .menu-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .menu-btn.whatsapp {
+      background: #1f7a42;
+      color: #ffffff;
+      border: none;
+    }
+
+    /* نافذة تكبير الصورة */
+    .image-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 110;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .image-modal.open {
+      display: flex;
+    }
+
+    .image-modal img {
+      max-width: 100%;
+      max-height: 90vh;
+      border-radius: 12px;
+    }
+  </style>
+</head>
+<body data-theme="dark">
+
+  <!-- القائمة الجانبية -->
+  <div class="drawer-backdrop" id="drawerBackdrop" onclick="toggleMenu()"></div>
+  <aside class="side-menu" id="sideMenu">
+    <div class="menu-title">
+      <span>الإعدادات والخيارات</span>
+      <button class="icon-btn" onclick="toggleMenu()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <button class="menu-btn" onclick="toggleMode()">
+      <i class="fa-solid fa-circle-half-stroke" id="themeIcon"></i>
+      <span id="themeLabel">الوضع النهاري</span>
+    </button>
+    <a href="https://wa.me/963956783552" target="_blank" class="menu-btn whatsapp">
+      <i class="fa-brands fa-whatsapp" style="font-size: 1.15rem;"></i>
+      <span>تواصل مع المطور</span>
+    </a>
+  </aside>
+
+  <!-- نافذة تكبير الصورة -->
+  <div class="image-modal" id="imageModal" onclick="closeImageModal()">
+    <img id="modalImgPreview" src="" alt="معاينة الشاشة">
+  </div>
+
+  <!-- نافذة الوصف الطويل (لمحة عن التطبيق) -->
+  <div class="modal-overlay" id="descModal" onclick="closeDescModal(event)">
+    <div class="modal-sheet">
+      <div class="modal-head">
+        <h4>لمحة عن هذا التطبيق</h4>
+        <button class="icon-btn" onclick="toggleDescModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-content-scroll" id="longDescContent">
+مرحباً بك في تطبيق نبض التفوق، منصتك التعليمية الشاملة في سوريا!
+
+هل تبحث عن مصدر موثوق يساعدك في رحلتك الدراسية؟ يقدم لك التطبيق كل ما تحتاجه لتحقيق النجاح والتفوق، مع واجهة حديثة وعصرية.
+
+ماذا يقدم لك التطبيق؟
+
+· شامل لجميع المراحل: يغطي احتياجات طلاب البكالوريا والصف التاسع والجامعات.
+· محتوى غني ومتنوع: دروس تعليمية، كتب وملخصات، ملفات شاملة، وجلسات تعليمية مصورة.
+· ميزات ذكية: برنامج لتنظيم وقت الدراسة، وأقسام تعتمد على الذكاء الاصطناعي لتقديم تجربة تعلم مخصصة.
+· التوقعات والامتحانات: قسم خاص بـ "التوقعات" لطلاب البكالوريا والتاسع، بالإضافة إلى نصائح وإرشادات حول الامتحانات النهائية.
+· مجاني بالكامل: يمكنك تحميل التطبيق والاستفادة من معظم محتوياته دون أي تكلفة.
+
+حمّل تطبيق نبض التفوق الآن وانطلق نحو مستقبل تعليمي مشرق!
+      </div>
+    </div>
+  </div>
+
+  <!-- الشريط العلوي (بدون زر بحث) -->
+  <header class="top-bar">
+    <button class="icon-btn" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+    <button class="icon-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+  </header>
+
+  <main class="main-content">
+
+    <!-- رأس التطبيق -->
+    <div class="app-meta-head">
+      <img 
+        src="https://i.ibb.co/fVBqj6W8/IMG-20260717-151527-109.jpg" 
+        alt="نبض التفوق" 
+        class="app-icon" 
+      />
+      <div class="app-meta-text">
+        <h1>نبض التفوق</h1>
+        <a href="https://wa.me/963956783552" target="_blank" class="dev-name">Ali Haj Hussain</a>
+        <div class="app-subnotes">التطبيق يتضمن نماذج مؤتمتة • مجاني بالكامل</div>
+      </div>
+    </div>
+
+    <!-- شريط الإحصائيات العلوي -->
+    <div class="store-stats-row">
+      <div class="stat-col">
+        <div class="stat-top">
+          <span>4.9</span> 
+          <i class="fa-solid fa-star" style="font-size: 0.72rem;"></i>
+        </div>
+        <div class="stat-bottom">
+          <span>137 ألف</span>
+          <i class="fa-solid fa-circle-info"></i>
+        </div>
+      </div>
+
+      <div class="stat-divider"></div>
+
+      <div class="stat-col">
+        <div class="stat-top">
+          <span class="stat-badge">E</span>
+        </div>
+        <div class="stat-bottom">
+          <span>الجميع</span>
+          <i class="fa-solid fa-circle-info"></i>
+        </div>
+      </div>
+
+      <div class="stat-divider"></div>
+
+      <div class="stat-col">
+        <div class="stat-top">
+          <span>+10 مليون</span>
+        </div>
+        <div class="stat-bottom">
+          <span>عمليات تنزيل</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- زر التثبيت -->
+    <a 
+      href="https://github.com/nabd0/nabd/releases/download/Nabd/nabd.apk" 
+      class="install-btn"
+    >
+      تثبيت
+    </a>
+
+    <!-- سلايدر لقطات الشاشة المرفوعة -->
+    <div class="shots-slider">
+      <div class="screenshot-frame" onclick="openImageModal('https://i.ibb.co/s9P0bkdF/Screenshot-com-nabdaltawafuq-app-Nabd-Main-Activity.jpg')">
+        <img src="https://i.ibb.co/s9P0bkdF/Screenshot-com-nabdaltawafuq-app-Nabd-Main-Activity.jpg" alt="لقطة شاشة 1" class="screenshot-img">
+      </div>
+      <div class="screenshot-frame" onclick="openImageModal('https://i.ibb.co/fVD6r6K5/Screenshot-com-nabdaltawafuq-app-Nabd-Main-Activity.jpg')">
+        <img src="https://i.ibb.co/fVD6r6K5/Screenshot-com-nabdaltawafuq-app-Nabd-Main-Activity.jpg" alt="لقطة شاشة 2" class="screenshot-img">
+      </div>
+      <div class="screenshot-frame" onclick="openImageModal('https://i.ibb.co/1G8K9pR7/Screenshot-com-nabdaltawafuq-app-Nabd-Main-Activity.jpg')">
+        <img src="https://i.ibb.co/1G8K9pR7/Screenshot-com-nabdaltawafuq-app-Nabd-Main-Activity.jpg" alt="لقطة شاشة 3" class="screenshot-img">
+      </div>
+      <div class="screenshot-frame" onclick="openImageModal('https://i.ibb.co/JRvH6VCy/Screenshot-com-nabdaltawafuq-app-Nabd-Main-Activity.jpg')">
+        <img src="https://i.ibb.co/JRvH6VCy/Screenshot-com-nabdaltawafuq-app-Nabd-Main-Activity.jpg" alt="لقطة شاشة 4" class="screenshot-img">
+      </div>
+      <div class="screenshot-frame" onclick="openImageModal('https://i.ibb.co/xt1gqhjf/Screenshot-com-nabdaltawafuq-app-Nabd-Main-Activity.jpg')">
+        <img src="https://i.ibb.co/xt1gqhjf/Screenshot-com-nabdaltawafuq-app-Nabd-Main-Activity.jpg" alt="لقطة شاشة 5" class="screenshot-img">
+      </div>
+      <div class="screenshot-frame" onclick="openImageModal('https://i.ibb.co/zWGm9HHn/Screenshot-com-nabdaltawafuq-app-Nabd-Main-Activity.jpg')">
+        <img src="https://i.ibb.co/zWGm9HHn/Screenshot-com-nabdaltawafuq-app-Nabd-Main-Activity.jpg" alt="لقطة شاشة 6" class="screenshot-img">
+      </div>
+      <div class="screenshot-frame" onclick="openImageModal('https://i.ibb.co/hFG76Sqk/Screenshot-com-nabdaltawafuq-app-Nabd-Main-Activity.jpg')">
+        <img src="https://i.ibb.co/hFG76Sqk/Screenshot-com-nabdaltawafuq-app-Nabd-Main-Activity.jpg" alt="لقطة شاشة 7" class="screenshot-img">
+      </div>
+    </div>
+
+    <!-- لمحة عن التطبيق: وصف قصير ووصف طويل منبثق -->
+    <div class="row-title" onclick="toggleDescModal()">
+      <h3>لمحة عن هذا التطبيق</h3>
+      <i class="fa-solid fa-arrow-left" style="font-size: 0.8rem; color: var(--text-sub);"></i>
+    </div>
+    <p class="app-short-desc">
+      منصة تعليمية سورية شاملة للبكالوريا والتاسع، دروس وملخصات وتوقعات وذكاء اصطناعي
+    </p>
+
+    <!-- جدول تفاصيل ومعلومات التطبيق (مطابق تماماً للصورة) -->
+    <div class="row-title">
+      <h3>معلومات التطبيق</h3>
+    </div>
+    <div class="app-info-card">
+      <div class="info-row-item">
+        <span class="info-label">الإصدار</span>
+        <span class="info-val">1.1</span>
+      </div>
+      <div class="info-row-item">
+        <span class="info-label">تاريخ التحديث</span>
+        <span class="info-val">2026/08/26</span>
+      </div>
+      <div class="info-row-item">
+        <span class="info-label">عمليات التنزيل</span>
+        <span class="info-val rtl-text">+10,000,000 عمليات تنزيل</span>
+      </div>
+      <div class="info-row-item">
+        <span class="info-label">حجم التنزيل</span>
+        <span class="info-val rtl-text">22.50 م.ب</span>
+      </div>
+      <div class="info-row-item">
+        <span class="info-label">نظام التشغيل المطلوب</span>
+        <span class="info-val rtl-text">إصدار Android 8.0 أو إصدارات أحدث</span>
+      </div>
+      <div class="info-row-item">
+        <span class="info-label">موقع التطبيق</span>
+        <span class="info-val rtl-text">سوريا - إدلب</span>
+      </div>
+      <div class="info-row-item">
+        <span class="info-label">اسم التاجر</span>
+        <span class="info-val rtl-text">Ali Haj Hussain</span>
+      </div>
+      <div class="info-row-item">
+        <span class="info-label">تاريخ الإصدار</span>
+        <span class="info-val">2024/09/15</span>
+      </div>
+      <div class="info-row-item">
+        <span class="info-label">أذونات التطبيق</span>
+        <span class="info-val rtl-text" style="color:#7dacfa; cursor:pointer;">الاطلاع على المزيد</span>
+      </div>
+    </div>
+
+    <!-- قسم أمان البيانات -->
+    <div class="row-title">
+      <h3>أمان البيانات</h3>
+      <i class="fa-solid fa-arrow-left" style="font-size: 0.8rem; color: var(--text-sub);"></i>
+    </div>
+    <div class="data-safety-card">
+      <div class="safety-item">
+        <i class="fa-solid fa-cloud-arrow-up"></i>
+        <span>لا يشارك هذا التطبيق بيانات المستخدمين مع أطراف ثالثة</span>
+      </div>
+      <div class="safety-item">
+        <i class="fa-solid fa-lock"></i>
+        <span>يتم تشفير البيانات أثناء النقل</span>
+      </div>
+      <div class="safety-item">
+        <i class="fa-solid fa-circle-minus"></i>
+        <span>يمكنك طلب حذف حسابك وبياناتك في أي وقت</span>
+      </div>
+      <a href="#" class="safety-link">عرض التفاصيل</a>
+    </div>
+
+    <!-- دعم التطبيق -->
+    <div class="accordion-card">
+      <button class="accordion-toggle" onclick="toggleAcc(this)">
+        <span>دعم التطبيق</span>
+        <i class="fa-solid fa-chevron-down"></i>
+      </button>
+      <div class="accordion-body" id="accBody">
+        <div class="support-info-row">
+          <i class="fa-solid fa-user-tie"></i>
+          <span>المطور: <strong>Ali Haj Hussain</strong></span>
+        </div>
+        <div class="support-info-row">
+          <i class="fa-solid fa-location-dot"></i>
+          <span>الموقع: <strong>سوريا - إدلب</strong></span>
+        </div>
+        <div class="support-info-row">
+          <i class="fa-solid fa-envelope"></i>
+          <span>البريد الإلكتروني: <a href="mailto:nabd.tafuq@gmail.com">nabd.tafuq@gmail.com</a></span>
+        </div>
+        <div class="support-info-row">
+          <i class="fa-solid fa-phone"></i>
+          <span>الهاتف: <a href="tel:0956783552">0956783552</a></span>
+        </div>
+        <div class="support-info-row">
+          <i class="fa-brands fa-whatsapp"></i>
+          <span>واتساب المباشر: <a href="https://wa.me/963956783552" target="_blank">+963956783552</a></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- التقييمات والمراجعات -->
+    <div class="reviews-section">
+      <div class="row-title">
+        <h3>التقييمات والمراجعات</h3>
+        <i class="fa-solid fa-arrow-left" style="font-size: 0.8rem; color: var(--text-sub);"></i>
+      </div>
+
+      <div class="verification-note">
+        <span>يتم التحقّق من التقييمات والمراجعات كما أنّها تصدُر عن أشخاص يستخدمون نوع الجهاز ذاته الذي تستخدمه.</span>
+        <i class="fa-solid fa-circle-info"></i>
+      </div>
+
+      <div class="rating-breakdown-row">
+        <div class="rating-big-num">
+          <div class="big-score">٤,٩</div>
+          <div class="stars-exact">★★★★★</div>
+          <div class="total-reviews-label">١٣٧.٨٠٩</div>
+        </div>
+
+        <div class="rating-bars-container">
+          <div class="bar-line">
+            <span class="bar-num">5</span>
+            <div class="bar-track"><div class="bar-progress" style="width: 88%;"></div></div>
+          </div>
+          <div class="bar-line">
+            <span class="bar-num">4</span>
+            <div class="bar-track"><div class="bar-progress" style="width: 8%;"></div></div>
+          </div>
+          <div class="bar-line">
+            <span class="bar-num">3</span>
+            <div class="bar-track"><div class="bar-progress" style="width: 2%;"></div></div>
+          </div>
+          <div class="bar-line">
+            <span class="bar-num">2</span>
+            <div class="bar-track"><div class="bar-progress" style="width: 1%;"></div></div>
+          </div>
+          <div class="bar-line">
+            <span class="bar-num">1</span>
+            <div class="bar-track"><div class="bar-progress" style="width: 1%;"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- كتابة مراجعة -->
+      <div class="write-review-card">
+        <div style="font-size: 0.78rem; font-weight: 600; color: var(--text-sub);">أضف تقييمك للتطبيق:</div>
+        <div class="stars-picker" id="starsSelector">
+          <i class="fa-solid fa-star active" data-val="1"></i>
+          <i class="fa-solid fa-star active" data-val="2"></i>
+          <i class="fa-solid fa-star active" data-val="3"></i>
+          <i class="fa-solid fa-star active" data-val="4"></i>
+          <i class="fa-solid fa-star active" data-val="5"></i>
+        </div>
+        <input type="text" id="reviewerName" class="inp-field" placeholder="اسمك الكريم..." required />
+        <textarea id="reviewerText" class="txt-field" rows="2" placeholder="اكتب تعليقك وملاحظاتك..." required></textarea>
+        <button class="post-btn" onclick="addNewReview()">نشر التعليق</button>
+      </div>
+
+      <!-- حاوية المراجعات مع الإعجاب والرد -->
+      <div id="reviewsWrapper"></div>
+
+    </div>
+
+  </main>
+
+  <script>
+    // القائمة الجانبية
+    function toggleMenu() {
+      document.getElementById('sideMenu').classList.toggle('show');
+      document.getElementById('drawerBackdrop').classList.toggle('show');
+    }
+
+    // الوضع الليلي / النهاري
+    function toggleMode() {
+      const current = document.body.getAttribute('data-theme');
+      const target = current === 'dark' ? 'light' : 'dark';
+      document.body.setAttribute('data-theme', target);
+      
+      const label = document.getElementById('themeLabel');
+      const icon = document.getElementById('themeIcon');
+      
+      if (target === 'light') {
+        label.textContent = 'الوضع الليلي';
+        icon.className = 'fa-solid fa-moon';
+      } else {
+        label.textContent = 'الوضع النهاري';
+        icon.className = 'fa-solid fa-sun';
+      }
+      localStorage.setItem('nabd_theme_mode', target);
+    }
+
+    const savedMode = localStorage.getItem('nabd_theme_mode');
+    if (savedMode) {
+      document.body.setAttribute('data-theme', savedMode);
+      if (savedMode === 'light') {
+        document.getElementById('themeLabel').textContent = 'الوضع الليلي';
+        document.getElementById('themeIcon').className = 'fa-solid fa-moon';
+      }
+    }
+
+    // فتح/إغلاق دعم التطبيق
+    function toggleAcc(btn) {
+      btn.classList.toggle('active');
+      document.getElementById('accBody').classList.toggle('open');
+    }
+
+    // نافذة الوصف الطويل المنبثقة
+    function toggleDescModal() {
+      document.getElementById('descModal').classList.toggle('active');
+    }
+
+    function closeDescModal(e) {
+      if (e.target.id === 'descModal') {
+        toggleDescModal();
+      }
+    }
+
+    // معاينة الصور
+    function openImageModal(src) {
+      document.getElementById('modalImgPreview').src = src;
+      document.getElementById('imageModal').classList.add('open');
+    }
+
+    function closeImageModal() {
+      document.getElementById('imageModal').classList.remove('open');
+    }
+
+    // محدد النجوم
+    let starCount = 5;
+    const pickerStars = document.querySelectorAll('#starsSelector i');
+    pickerStars.forEach(st => {
+      st.addEventListener('click', () => {
+        starCount = parseInt(st.getAttribute('data-val'));
+        pickerStars.forEach(s => {
+          const v = parseInt(s.getAttribute('data-val'));
+          if (v <= starCount) {
+            s.classList.add('active');
+          } else {
+            s.classList.remove('active');
+          }
+        });
+      });
+    });
+
+    // قائمة المراجعات الافتراضية مزودة بالإعجاب والردود
+    const initialList = [
+      {
+        id: 1,
+        name: "maher bacheir",
+        avatar: "m",
+        date: "٢٠٢٦/٦/٢٦",
+        rating: 5,
+        text: "التطبيق بسيط وسهل الاستخدام ومفيد جداً في مراجعة الاختبارات. خدمة ممتازة ودعم فني متجاوب وسريع.",
+        likes: 12,
+        isLiked: false,
+        replies: [
+          { author: "Ali Haj Hussain (المطور)", text: "شكراً جزيلاً لك أخي ماهر، نسعى دائماً لتقديم الأفضل لطلابنا." }
+        ]
+      },
+      {
+        id: 2,
+        name: "خالد المنصور",
+        avatar: "خ",
+        date: "٢٠٢٦/٥/١٤",
+        rating: 5,
+        text: "أفضل تطبيق للأسئلة المؤتمتة والتوقعات، كل الشكر للأستاذ علي على هذا المجهود الرائع.",
+        likes: 8,
+        isLiked: false,
+        replies: []
+      }
+    ];
+
+    let allReviews = JSON.parse(localStorage.getItem('nabd_detailed_comments')) || initialList;
+
+    function renderReviews() {
+      const container = document.getElementById('reviewsWrapper');
+      container.innerHTML = '';
+
+      allReviews.forEach(rev => {
+        const item = document.createElement('div');
+        item.className = 'single-review';
+
+        let starsGold = '★'.repeat(rev.rating) + '☆'.repeat(5 - rev.rating);
+
+        const repliesHtml = rev.replies.map(rep => `
+          <div class="reply-item">
+            <div class="reply-author">${escapeText(rep.author)}</div>
+            <div class="reply-text">${escapeText(rep.text)}</div>
+          </div>
+        `).join('');
+
+        item.innerHTML = `
+          <div class="reviewer-header">
+            <div class="reviewer-meta">
+              <div class="user-avatar">${rev.avatar}</div>
+              <span class="reviewer-name">${escapeText(rev.name)}</span>
+            </div>
+            <i class="fa-solid fa-ellipsis-vertical" style="font-size: 0.8rem; color: var(--text-sub); cursor:pointer;"></i>
+          </div>
+          <div class="review-date-stars">
+            <span class="stars-gold">${starsGold}</span>
+            <span>${rev.date}</span>
+          </div>
+          <div class="review-body-text">${escapeText(rev.text)}</div>
+          
+          <div class="review-actions-bar">
+            <button class="action-btn-rev ${rev.isLiked ? 'liked' : ''}" onclick="toggleLikeReview(${rev.id})">
+              <i class="fa-solid fa-thumbs-up"></i> 
+              <span>${rev.likes}</span>
+            </button>
+            <button class="action-btn-rev" onclick="toggleReplyBox(${rev.id})">
+              <i class="fa-solid fa-reply"></i> 
+              <span>رد</span>
+            </button>
+          </div>
+
+          <div class="reply-input-box" id="replyBox-${rev.id}">
+            <input type="text" id="replyAuthor-${rev.id}" class="inp-field" placeholder="اسمك..." style="margin-bottom:4px;" />
+            <input type="text" id="replyText-${rev.id}" class="inp-field" placeholder="اكتب ردك هنا..." style="margin-bottom:4px;" />
+            <button class="post-btn" style="align-self:flex-start;" onclick="postReply(${rev.id})">إرسال الرد</button>
+          </div>
+
+          ${rev.replies.length > 0 ? `<div class="replies-container">${repliesHtml}</div>` : ''}
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function toggleLikeReview(id) {
+      const review = allReviews.find(r => r.id === id);
+      if (review) {
+        if (review.isLiked) {
+          review.likes -= 1;
+          review.isLiked = false;
+        } else {
+          review.likes += 1;
+          review.isLiked = true;
+        }
+        saveAndRefresh();
+      }
+    }
+
+    function toggleReplyBox(id) {
+      const box = document.getElementById(`replyBox-${id}`);
+      box.classList.toggle('show');
+    }
+
+    function postReply(id) {
+      const authorInput = document.getElementById(`replyAuthor-${id}`);
+      const textInput = document.getElementById(`replyText-${id}`);
+
+      if (!authorInput.value.trim() || !textInput.value.trim()) {
+        alert('يرجى كتابة الاسم والرد.');
+        return;
+      }
+
+      const review = allReviews.find(r => r.id === id);
+      if (review) {
+        review.replies.push({
+          author: authorInput.value.trim(),
+          text: textInput.value.trim()
+        });
+        saveAndRefresh();
+      }
+    }
+
+    function addNewReview() {
+      const name = document.getElementById('reviewerName');
+      const text = document.getElementById('reviewerText');
+
+      if (!name.value.trim() || !text.value.trim()) {
+        alert('يرجى كتابة الاسم والتعليق.');
+        return;
+      }
+
+      const today = new Date();
+      const arabicDate = `${today.getFullYear()}/${today.getMonth() + 1}/${today.getDate()}`;
+
+      allReviews.unshift({
+        id: Date.now(),
+        name: name.value.trim(),
+        avatar: name.value.trim().charAt(0).toUpperCase(),
+        date: arabicDate,
+        rating: starCount,
+        text: text.value.trim(),
+        likes: 0,
+        isLiked: false,
+        replies: []
+      });
+
+      name.value = '';
+      text.value = '';
+      saveAndRefresh();
+    }
+
+    function saveAndRefresh() {
+      localStorage.setItem('nabd_detailed_comments', JSON.stringify(allReviews));
+      renderReviews();
+    }
+
+    function escapeText(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // العرض الأولي
+    renderReviews();
+  </script>
+</body>
+</html>
