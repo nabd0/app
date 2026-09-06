@@ -863,11 +863,11 @@
     <div class="store-stats-row">
       <div class="stat-col">
         <div class="stat-top">
-          <span>4.9</span> 
+          <span id="averageRating">0.0</span>
           <i class="fa-solid fa-star" style="font-size: 0.72rem;"></i>
         </div>
         <div class="stat-bottom">
-          <span>137 ألف</span>
+          <span id="reviewCount">0</span>
           <i class="fa-solid fa-circle-info"></i>
         </div>
       </div>
@@ -888,7 +888,7 @@
 
       <div class="stat-col">
         <div class="stat-top">
-          <span>+10 مليون</span>
+          <span id="downloadCount">0</span>
         </div>
         <div class="stat-bottom">
           <span>عمليات تنزيل</span>
@@ -900,6 +900,7 @@
     <a 
       href="https://github.com/nabd0/nabd/releases/download/Nabd/nabd.apk" 
       class="install-btn"
+      onclick="registerDownload(event)"
     >
       تثبيت
     </a>
@@ -1097,7 +1098,13 @@
 
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
+    const SUPABASE_URL = 'https://rdloatumugasadynfths.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_TPq0Cc95hedzA2e-lQ_cDQ_Bf__V4Yp';
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const DOWNLOAD_URL = 'https://github.com/nabd0/nabd/releases/download/Nabd/nabd.apk';
+
     // القائمة الجانبية
     function toggleMenu() {
       document.getElementById('sideMenu').classList.toggle('show');
@@ -1176,168 +1183,117 @@
       });
     });
 
-    // قائمة المراجعات الافتراضية مزودة بالإعجاب والردود
-    const initialList = [
-      {
-        id: 1,
-        name: "maher bacheir",
-        avatar: "m",
-        date: "٢٠٢٦/٦/٢٦",
-        rating: 5,
-        text: "التطبيق بسيط وسهل الاستخدام ومفيد جداً في مراجعة الاختبارات. خدمة ممتازة ودعم فني متجاوب وسريع.",
-        likes: 12,
-        isLiked: false,
-        replies: [
-          { author: "Ali Haj Hussain (المطور)", text: "شكراً جزيلاً لك أخي ماهر، نسعى دائماً لتقديم الأفضل لطلابنا." }
-        ]
-      },
-      {
-        id: 2,
-        name: "خالد المنصور",
-        avatar: "خ",
-        date: "٢٠٢٦/٥/١٤",
-        rating: 5,
-        text: "أفضل تطبيق للأسئلة المؤتمتة والتوقعات، كل الشكر للأستاذ علي على هذا المجهود الرائع.",
-        likes: 8,
-        isLiked: false,
-        replies: []
-      }
-    ];
+    let allReviews = [];
+    let isSubmittingReview = false;
 
-    let allReviews = JSON.parse(localStorage.getItem('nabd_detailed_comments')) || initialList;
+    function formatDate(dateString) {
+      return new Intl.DateTimeFormat('ar', { year: 'numeric', month: 'numeric', day: 'numeric' }).format(new Date(dateString));
+    }
+
+    function updateReviewStats() {
+      const count = allReviews.length;
+      const average = count ? allReviews.reduce((sum, review) => sum + Number(review.rating), 0) / count : 0;
+      document.getElementById('averageRating').textContent = average.toFixed(1);
+      document.getElementById('reviewCount').textContent = count.toLocaleString('ar');
+      document.querySelector('.big-score').textContent = average.toFixed(1);
+      document.querySelector('.total-reviews-label').textContent = `${count.toLocaleString('ar')} مراجعة`;
+      document.querySelectorAll('.bar-progress').forEach((bar, index) => {
+        const star = 5 - index;
+        const matching = allReviews.filter(review => Number(review.rating) === star).length;
+        bar.style.width = count ? `${(matching / count) * 100}%` : '0%';
+      });
+    }
 
     function renderReviews() {
       const container = document.getElementById('reviewsWrapper');
       container.innerHTML = '';
-
+      if (!allReviews.length) {
+        container.innerHTML = '<p style="color:var(--text-sub);font-size:.8rem;padding:12px 0;">لا توجد تعليقات بعد. كن أول من يقيّم التطبيق.</p>';
+        updateReviewStats();
+        return;
+      }
       allReviews.forEach(rev => {
         const item = document.createElement('div');
         item.className = 'single-review';
-
-        let starsGold = '★'.repeat(rev.rating) + '☆'.repeat(5 - rev.rating);
-
-        const repliesHtml = rev.replies.map(rep => `
-          <div class="reply-item">
-            <div class="reply-author">${escapeText(rep.author)}</div>
-            <div class="reply-text">${escapeText(rep.text)}</div>
-          </div>
-        `).join('');
-
+        const rating = Number(rev.rating);
+        const starsGold = '★'.repeat(rating) + '☆'.repeat(5 - rating);
         item.innerHTML = `
           <div class="reviewer-header">
             <div class="reviewer-meta">
-              <div class="user-avatar">${rev.avatar}</div>
+              <div class="user-avatar">${escapeText(rev.name.charAt(0).toUpperCase())}</div>
               <span class="reviewer-name">${escapeText(rev.name)}</span>
             </div>
-            <i class="fa-solid fa-ellipsis-vertical" style="font-size: 0.8rem; color: var(--text-sub); cursor:pointer;"></i>
           </div>
           <div class="review-date-stars">
             <span class="stars-gold">${starsGold}</span>
-            <span>${rev.date}</span>
+            <span>${formatDate(rev.created_at)}</span>
           </div>
-          <div class="review-body-text">${escapeText(rev.text)}</div>
-          
-          <div class="review-actions-bar">
-            <button class="action-btn-rev ${rev.isLiked ? 'liked' : ''}" onclick="toggleLikeReview(${rev.id})">
-              <i class="fa-solid fa-thumbs-up"></i> 
-              <span>${rev.likes}</span>
-            </button>
-            <button class="action-btn-rev" onclick="toggleReplyBox(${rev.id})">
-              <i class="fa-solid fa-reply"></i> 
-              <span>رد</span>
-            </button>
-          </div>
-
-          <div class="reply-input-box" id="replyBox-${rev.id}">
-            <input type="text" id="replyAuthor-${rev.id}" class="inp-field" placeholder="اسمك..." style="margin-bottom:4px;" />
-            <input type="text" id="replyText-${rev.id}" class="inp-field" placeholder="اكتب ردك هنا..." style="margin-bottom:4px;" />
-            <button class="post-btn" style="align-self:flex-start;" onclick="postReply(${rev.id})">إرسال الرد</button>
-          </div>
-
-          ${rev.replies.length > 0 ? `<div class="replies-container">${repliesHtml}</div>` : ''}
+          <div class="review-body-text">${escapeText(rev.comment)}</div>
         `;
         container.appendChild(item);
       });
+      updateReviewStats();
     }
 
-    function toggleLikeReview(id) {
-      const review = allReviews.find(r => r.id === id);
-      if (review) {
-        if (review.isLiked) {
-          review.likes -= 1;
-          review.isLiked = false;
-        } else {
-          review.likes += 1;
-          review.isLiked = true;
-        }
-        saveAndRefresh();
+    async function loadAppData() {
+      const [{ data: stats, error: statsError }, { data: reviews, error: reviewsError }] = await Promise.all([
+        supabaseClient.from('app_stats').select('downloads').eq('id', 'nabd-app').maybeSingle(),
+        supabaseClient.from('reviews').select('id,name,rating,comment,created_at').order('created_at', { ascending: false }).limit(100)
+      ]);
+      if (!statsError && stats) document.getElementById('downloadCount').textContent = Number(stats.downloads).toLocaleString('ar');
+      if (!reviewsError) {
+        allReviews = reviews || [];
+        renderReviews();
+      } else {
+        console.error('تعذر تحميل التقييمات:', reviewsError);
       }
     }
 
-    function toggleReplyBox(id) {
-      const box = document.getElementById(`replyBox-${id}`);
-      box.classList.toggle('show');
+    async function registerDownload(event) {
+      event.preventDefault();
+      const button = event.currentTarget;
+      button.style.pointerEvents = 'none';
+      const { data, error } = await supabaseClient.rpc('increment_downloads');
+      if (!error && data !== null) document.getElementById('downloadCount').textContent = Number(data).toLocaleString('ar');
+      else console.error('تعذر تسجيل التنزيل:', error);
+      window.location.href = DOWNLOAD_URL;
     }
 
-    function postReply(id) {
-      const authorInput = document.getElementById(`replyAuthor-${id}`);
-      const textInput = document.getElementById(`replyText-${id}`);
-
-      if (!authorInput.value.trim() || !textInput.value.trim()) {
-        alert('يرجى كتابة الاسم والرد.');
-        return;
-      }
-
-      const review = allReviews.find(r => r.id === id);
-      if (review) {
-        review.replies.push({
-          author: authorInput.value.trim(),
-          text: textInput.value.trim()
-        });
-        saveAndRefresh();
-      }
-    }
-
-    function addNewReview() {
+    async function addNewReview() {
+      if (isSubmittingReview) return;
       const name = document.getElementById('reviewerName');
       const text = document.getElementById('reviewerText');
-
       if (!name.value.trim() || !text.value.trim()) {
         alert('يرجى كتابة الاسم والتعليق.');
         return;
       }
-
-      const today = new Date();
-      const arabicDate = `${today.getFullYear()}/${today.getMonth() + 1}/${today.getDate()}`;
-
-      allReviews.unshift({
-        id: Date.now(),
+      isSubmittingReview = true;
+      const button = document.querySelector('.write-review-card .post-btn');
+      button.disabled = true;
+      const { error } = await supabaseClient.from('reviews').insert({
         name: name.value.trim(),
-        avatar: name.value.trim().charAt(0).toUpperCase(),
-        date: arabicDate,
         rating: starCount,
-        text: text.value.trim(),
-        likes: 0,
-        isLiked: false,
-        replies: []
+        comment: text.value.trim()
       });
-
-      name.value = '';
-      text.value = '';
-      saveAndRefresh();
-    }
-
-    function saveAndRefresh() {
-      localStorage.setItem('nabd_detailed_comments', JSON.stringify(allReviews));
-      renderReviews();
+      if (error) {
+        alert('تعذر حفظ التقييم، يرجى المحاولة مرة أخرى.');
+        console.error('تعذر حفظ التقييم:', error);
+      } else {
+        name.value = '';
+        text.value = '';
+        starCount = 5;
+        document.querySelectorAll('#starsSelector i').forEach(star => star.classList.add('active'));
+        await loadAppData();
+      }
+      button.disabled = false;
+      isSubmittingReview = false;
     }
 
     function escapeText(str) {
-      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
     }
 
-    // العرض الأولي
-    renderReviews();
+    loadAppData();
   </script>
 </body>
 </html>
